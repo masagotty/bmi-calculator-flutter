@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'screens/input_page.dart';
+import 'physical_data.dart';
 
-void main() => runApp(BMICalculator());
+void main() {
+  runApp(ChangeNotifierProvider<PhysicalData>(
+    create: (context) => PhysicalData(),
+    child: BMICalculator(),
+  ));
+}
 
 class BMICalculator extends StatelessWidget {
   @override

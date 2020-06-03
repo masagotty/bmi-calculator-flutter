@@ -7,22 +7,13 @@ import 'package:bmi_calculator/constants.dart';
 import 'package:bmi_calculator/components/bottom_button.dart';
 import 'package:bmi_calculator/components/round_icon_button.dart';
 import 'calculator_brain.dart';
+import 'package:bmi_calculator/physical_data.dart';
+import 'package:provider/provider.dart';
 
-enum Gender { male, female }
-
-class InputPage extends StatefulWidget {
-  @override
-  _InputPageState createState() => _InputPageState();
-}
-
-class _InputPageState extends State<InputPage> {
-  Gender selectedGender;
-  int height = 180;
-  int weight = 70;
-  int age = 25;
-
+class InputPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    PhysicalData physicalData = Provider.of<PhysicalData>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text('BMI CALCULATOR'),
@@ -41,25 +32,21 @@ class _InputPageState extends State<InputPage> {
                         label: 'MALE',
                         icon: FontAwesomeIcons.mars,
                       ),
-                      color: selectedGender == Gender.male
+                      color: physicalData.getGender == Gender.male
                           ? kActiveCardColor
                           : kInactiveCardColor,
                       onPress: () {
-                        setState(() {
-                          selectedGender = Gender.male;
-                        });
+                        physicalData.toggleMale();
                       },
                     )),
                 Expanded(
                     flex: 1,
                     child: ReusableCard(
-                      color: selectedGender == Gender.female
+                      color: physicalData.getGender == Gender.female
                           ? kActiveCardColor
                           : kInactiveCardColor,
                       onPress: () {
-                        setState(() {
-                          selectedGender = Gender.female;
-                        });
+                        physicalData.toggleFemale();
                       },
                       cardChild: IconContent(
                         label: 'FEMALE',
@@ -86,7 +73,7 @@ class _InputPageState extends State<InputPage> {
                       textBaseline: TextBaseline.alphabetic,
                       children: [
                         Text(
-                          height.toString(),
+                          physicalData.getHeight.toString(),
                           style: kNumberTextStyle,
                         ),
                         Text(
@@ -106,13 +93,11 @@ class _InputPageState extends State<InputPage> {
                           overlayShape:
                               RoundSliderOverlayShape(overlayRadius: 30.0)),
                       child: Slider(
-                        value: height.toDouble(),
+                        value: physicalData.getHeight.toDouble(),
                         min: 120.0,
                         max: 220.0,
                         onChanged: (double newValue) {
-                          setState(() {
-                            height = newValue.round();
-                          });
+                          physicalData.changeHeight(newValue.round());
                         },
                       ),
                     ),
@@ -134,7 +119,7 @@ class _InputPageState extends State<InputPage> {
                             style: kLabelTextStyle,
                           ),
                           Text(
-                            weight.toString(),
+                            physicalData.getWeight.toString(),
                             style: kNumberTextStyle,
                           ),
                           Row(
@@ -143,18 +128,14 @@ class _InputPageState extends State<InputPage> {
                               RoundIconButton(
                                 icon: FontAwesomeIcons.minus,
                                 onPressed: () {
-                                  setState(() {
-                                    weight--;
-                                  });
+                                  physicalData.decrementWeight();
                                 },
                               ),
                               SizedBox(width: 10.0),
                               RoundIconButton(
                                 icon: FontAwesomeIcons.plus,
                                 onPressed: () {
-                                  setState(() {
-                                    weight++;
-                                  });
+                                  physicalData.incrementWeight();
                                 },
                               ),
                             ],
@@ -174,7 +155,7 @@ class _InputPageState extends State<InputPage> {
                             style: kLabelTextStyle,
                           ),
                           Text(
-                            age.toString(),
+                            physicalData.getAge.toString(),
                             style: kNumberTextStyle,
                           ),
                           Row(
@@ -183,18 +164,14 @@ class _InputPageState extends State<InputPage> {
                               RoundIconButton(
                                 icon: FontAwesomeIcons.minus,
                                 onPressed: () {
-                                  setState(() {
-                                    age--;
-                                  });
+                                  physicalData.decrementAge();
                                 },
                               ),
                               SizedBox(width: 10.0),
                               RoundIconButton(
                                 icon: FontAwesomeIcons.plus,
                                 onPressed: () {
-                                  setState(() {
-                                    age++;
-                                  });
+                                  physicalData.incrementAge();
                                 },
                               ),
                             ],
@@ -207,8 +184,9 @@ class _InputPageState extends State<InputPage> {
           ),
           BottomButton(
             onTap: () {
-              CalculatorBrain calc =
-                  CalculatorBrain(height: height, weight: weight);
+              CalculatorBrain calc = CalculatorBrain(
+                  height: physicalData.getHeight,
+                  weight: physicalData.getWeight);
 
               Navigator.push(
                   context,
